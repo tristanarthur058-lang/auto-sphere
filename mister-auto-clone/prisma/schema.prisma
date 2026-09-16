@@ -3,16 +3,9 @@
 // commenté ci-dessous, puis lance `npx prisma migrate dev`.
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
-
-// --- Version PostgreSQL (production) ---
-// datasource db {
-//   provider = "postgresql"
-//   url      = env("DATABASE_URL")
-// }
-
 generator client {
   provider = "prisma-client-js"
 }
