@@ -1,0 +1,56 @@
+// Schéma de développement : SQLite (fichier local, zéro config).
+// Pour la production, remplace le bloc "datasource" par le bloc PostgreSQL
+// commenté ci-dessous, puis lance `npx prisma migrate dev`.
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// --- Version PostgreSQL (production) ---
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  products Product[]
+}
+
+// "Brand" représente ici la marque du véhicule d'origine (Mercedes, Audi, BMW…),
+// utilisée à la fois pour le rayon "marques" de la page d'accueil et pour le
+// filtre "sélectionnez votre marque" de l'en-tête.
+model Brand {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  logoUrl  String?
+  products Product[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  reference   String   @unique
+  name        String
+  description String
+  price       Float
+  oldPrice    Float?
+  imageUrl    String
+  // Liste de photos supplémentaires séparées par des virgules (galerie sur la fiche produit)
+  images      String   @default("")
+  inStock     Boolean  @default(true)
+  bestSeller  Boolean  @default(false)
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  brand       Brand    @relation(fields: [brandId], references: [id])
+  brandId     String
+  createdAt   DateTime @default(now())
+}
